@@ -3,14 +3,19 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Comet SS | Games</title>
+<title>Comet SS | Games v2</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background-color: #0a0e1a; color: #fff; min-height: 100vh;
+    background-color: #0a0e1a;
+    color: #fff;
+    min-height: 100vh;
 }
+
 .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
+
 header { margin-bottom: 50px; padding-bottom: 20px; border-bottom: 2px solid #1e293b; }
 h1 { color: #3b82f6; font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
 .subtitle { color: #64748b; font-size: 1rem; }
@@ -20,16 +25,38 @@ h1 { color: #3b82f6; font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 25px;
 }
+
 .game-card {
-    background: #151b29; border-radius: 10px; padding: 25px; border: 1px solid #1e293b;
-    transition: all 0.3s ease;
+    background: #151b29;
+    border-radius: 10px;
+    padding: 25px;
+    border: 1px solid #1e293b;
+    transition: all 0.3s ease, opacity 0.5s ease;
+    opacity: 0;
 }
+
+.game-card.visible { opacity: 1; }
+
 .game-card:hover {
-    border-color: #3b82f6; transform: translateY(-3px);
-    box-shadow: 0 10px 30px rgba(59,130,246,0.2);
+    border-color: #3b82f6;
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(59,130,246,0.3);
 }
+
 .game-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-.game-icon { width: 80px; height: 80px; border-radius: 10px; background: #1e293b; object-fit: cover; }
+
+.game-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 10px;
+    background: #1e293b;
+    object-fit: cover;
+    transition: transform 0.3s ease, opacity 0.5s ease;
+    opacity: 0;
+}
+
+.game-icon.loaded { opacity: 1; transform: scale(1); }
+
 .game-title { font-size: 1.3rem; font-weight: 600; color: #fff; margin-bottom: 5px; }
 .game-genre { font-size: 0.9rem; color: #64748b; }
 
@@ -79,7 +106,7 @@ const games = [
     { placeId: '137010059674036', name: '[💘] Slap Tower 🖐️ [X999]', genre: 'Obby' },
 ];
 
-function createGameCard(game) {
+function createGameCard(game, index) {
     const card = document.createElement('div');
     card.className = 'game-card';
     card.innerHTML = `
@@ -99,6 +126,13 @@ function createGameCard(game) {
         <a href="https://www.roblox.com/games/${game.placeId}" target="_blank" class="join-btn">Join Game</a>
     `;
     document.getElementById('gamesGrid').appendChild(card);
+
+    // Fade in card with stagger
+    setTimeout(() => card.classList.add('visible'), index * 100);
+
+    // Animate thumbnail when loaded
+    const img = card.querySelector('.game-icon');
+    img.onload = () => img.classList.add('loaded');
 }
 
 async function fetchPlayerCount(placeId) {
@@ -115,13 +149,15 @@ async function fetchPlayerCount(placeId) {
 async function updatePlayerCounts() {
     for (const game of games) {
         const countEl = document.getElementById(`players-${game.placeId}`);
-        countEl.textContent = 'Loading...';
-        countEl.className = 'player-count loading';
+        const currentCount = countEl.dataset.current || 0;
 
         const count = await fetchPlayerCount(game.placeId);
         if (count !== null) {
-            countEl.innerHTML = `<span class="pulse"></span>${count.toLocaleString()} online`;
-            countEl.className = 'player-count';
+            if (count != currentCount) {
+                countEl.dataset.current = count;
+                countEl.innerHTML = `<span class="pulse"></span>${count.toLocaleString()} online`;
+                countEl.className = 'player-count';
+            }
         } else {
             countEl.textContent = 'Unable to load';
             countEl.className = 'player-count error';
