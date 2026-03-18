@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Comet SS | Games v2</title>
+<title>Comet SS | Games</title>
 
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -54,13 +54,13 @@ h1 { color: #3b82f6; font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
     border-radius: 10px;
     background: #1e293b;
     object-fit: cover;
-    transition: transform 0.3s ease, opacity 0.5s ease;
     opacity: 0;
+    transition: opacity 0.4s ease;
 }
 
-.game-icon.loaded { opacity: 1; transform: scale(1); }
+.game-icon.loaded { opacity: 1; }
 
-.game-title { font-size: 1.3rem; font-weight: 600; color: #fff; margin-bottom: 5px; }
+.game-title { font-size: 1.3rem; font-weight: 600; }
 
 .game-genre { font-size: 0.9rem; color: #64748b; }
 
@@ -90,7 +90,6 @@ h1 { color: #3b82f6; font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    display: inline-block;
     background: #4ade80;
     animation: pulse 2s infinite;
 }
@@ -110,13 +109,9 @@ h1 { color: #3b82f6; font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
     text-decoration: none;
     border-radius: 6px;
     font-weight: 600;
-    transition: all 0.3s ease;
 }
 
-.join-btn:hover {
-    background: #2563eb;
-    transform: translateY(-2px);
-}
+.join-btn:hover { background: #2563eb; }
 
 footer {
     margin-top: 60px;
@@ -139,7 +134,7 @@ footer {
 <div class="container">
 
 <header>
-    <h1>Comet SS | Games v2</h1>
+    <h1>Comet SS | Games</h1>
     <p class="subtitle">Real-time player counts • Updated automatically</p>
 </header>
 
@@ -150,7 +145,7 @@ footer {
 </div>
 
 <footer>
-    <p>&copy; 2026 Comet SS. All rights reserved.</p>
+    <p>&copy; 2026 Comet SS</p>
 </footer>
 
 </div>
@@ -172,8 +167,7 @@ function createGameCard(game, index) {
     card.innerHTML = `
         <div class="game-header">
             <img class="game-icon"
-                src="https://thumbnails.roblox.com/v1/places/gameicons?placeIds=${game.placeId}&size=150x150&format=Png"
-                alt="${game.name}">
+                src="https://www.roblox.com/asset-thumbnail/image?assetId=${game.placeId}&width=150&height=150&format=png">
             <div>
                 <div class="game-title">${game.name}</div>
                 <div class="game-genre">${game.genre}</div>
@@ -196,18 +190,17 @@ function createGameCard(game, index) {
 
     const img = card.querySelector('.game-icon');
     img.onload = () => img.classList.add('loaded');
-    img.onerror = () => {
-        img.src = 'https://via.placeholder.com/80?text=No+Icon';
-        img.classList.add('loaded');
-    };
 }
 
-/* FAST + RELIABLE FETCH */
+/* FIXED FETCH (USES PROXY SO IT DOESN’T FAIL) */
 async function updatePlayerCounts() {
     const ids = games.map(g => g.placeId).join(',');
 
     try {
-        const res = await fetch(`https://games.roblox.com/v1/games/multiget-place-details?placeIds=${ids}`);
+        const res = await fetch(
+            `https://api.allorigins.win/raw?url=https://games.roblox.com/v1/games/multiget-place-details?placeIds=${ids}`
+        );
+
         const data = await res.json();
 
         data.data.forEach(game => {
@@ -219,8 +212,6 @@ async function updatePlayerCounts() {
         });
 
     } catch (e) {
-        console.error(e);
-
         document.querySelectorAll('.player-count').forEach(el => {
             el.textContent = 'Unable to load';
             el.className = 'player-count error';
@@ -228,7 +219,6 @@ async function updatePlayerCounts() {
     }
 }
 
-/* INIT */
 games.forEach(createGameCard);
 updatePlayerCounts();
 setInterval(updatePlayerCounts, 30000);
