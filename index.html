@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Comet SS | Games v2</title>
+
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -17,7 +18,9 @@ body {
 .container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; }
 
 header { margin-bottom: 50px; padding-bottom: 20px; border-bottom: 2px solid #1e293b; }
+
 h1 { color: #3b82f6; font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
+
 .subtitle { color: #64748b; font-size: 1rem; }
 
 .games-grid {
@@ -58,30 +61,85 @@ h1 { color: #3b82f6; font-size: 2.5rem; font-weight: 700; margin-bottom: 10px; }
 .game-icon.loaded { opacity: 1; transform: scale(1); }
 
 .game-title { font-size: 1.3rem; font-weight: 600; color: #fff; margin-bottom: 5px; }
+
 .game-genre { font-size: 0.9rem; color: #64748b; }
 
-.player-info { background: #0a0e1a; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+.player-info {
+    background: #0a0e1a;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
 .player-label { color: #64748b; font-size: 0.85rem; margin-bottom: 5px; }
-.player-count { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 8px; color: #4ade80; }
+
+.player-count {
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #4ade80;
+}
+
 .player-count.loading { font-size: 1rem; color: #64748b; }
+
 .player-count.error { font-size: 0.9rem; color: #f87171; }
-.pulse { width: 8px; height: 8px; border-radius: 50%; display: inline-block; background: #4ade80; animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.5} }
+
+.pulse {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    background: #4ade80;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%,100% { opacity: 1 }
+    50% { opacity: 0.5 }
+}
 
 .join-btn {
-    display: block; width: 100%; padding: 12px; background: #3b82f6; color: #fff; text-align: center;
-    text-decoration: none; border-radius: 6px; font-weight: 600; transition: all 0.3s ease;
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: #3b82f6;
+    color: #fff;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: all 0.3s ease;
 }
-.join-btn:hover { background: #2563eb; transform: translateY(-2px); }
 
-footer { margin-top: 60px; padding-top: 30px; border-top: 2px solid #1e293b; text-align: center; color: #64748b; }
-.refresh-info { text-align: center; color: #64748b; font-size: 0.85rem; margin-top: 30px; }
+.join-btn:hover {
+    background: #2563eb;
+    transform: translateY(-2px);
+}
+
+footer {
+    margin-top: 60px;
+    padding-top: 30px;
+    border-top: 2px solid #1e293b;
+    text-align: center;
+    color: #64748b;
+}
+
+.refresh-info {
+    text-align: center;
+    color: #64748b;
+    font-size: 0.85rem;
+    margin-top: 30px;
+}
 </style>
 </head>
+
 <body>
 <div class="container">
+
 <header>
-    <h1>Comet SS | Games</h1>
+    <h1>Comet SS | Games v2</h1>
     <p class="subtitle">Real-time player counts • Updated automatically</p>
 </header>
 
@@ -92,8 +150,9 @@ footer { margin-top: 60px; padding-top: 30px; border-top: 2px solid #1e293b; tex
 </div>
 
 <footer>
-    <p>&copy; 2025 Comet SS. All rights reserved.</p>
+    <p>&copy; 2026 Comet SS. All rights reserved.</p>
 </footer>
+
 </div>
 
 <script>
@@ -109,66 +168,71 @@ const games = [
 function createGameCard(game, index) {
     const card = document.createElement('div');
     card.className = 'game-card';
+
     card.innerHTML = `
         <div class="game-header">
-            <img class="game-icon" src="https://www.roblox.com/asset-thumbnail/image?assetId=${game.placeId}&width=150&height=150&format=png" 
-                 alt="${game.name}"
-                 onerror="this.src='https://via.placeholder.com/80?text=No+Icon'">
+            <img class="game-icon"
+                src="https://thumbnails.roblox.com/v1/places/gameicons?placeIds=${game.placeId}&size=150x150&format=Png"
+                alt="${game.name}">
             <div>
                 <div class="game-title">${game.name}</div>
                 <div class="game-genre">${game.genre}</div>
             </div>
         </div>
+
         <div class="player-info">
             <div class="player-label">Active Players</div>
             <div class="player-count loading" id="players-${game.placeId}">Loading...</div>
         </div>
-        <a href="https://www.roblox.com/games/${game.placeId}" target="_blank" class="join-btn">Join Game</a>
+
+        <a href="https://www.roblox.com/games/${game.placeId}" target="_blank" class="join-btn">
+            Join Game
+        </a>
     `;
+
     document.getElementById('gamesGrid').appendChild(card);
 
-    // Fade in card with stagger
     setTimeout(() => card.classList.add('visible'), index * 100);
 
-    // Animate thumbnail when loaded
     const img = card.querySelector('.game-icon');
     img.onload = () => img.classList.add('loaded');
+    img.onerror = () => {
+        img.src = 'https://via.placeholder.com/80?text=No+Icon';
+        img.classList.add('loaded');
+    };
 }
 
-async function fetchPlayerCount(placeId) {
+/* FAST + RELIABLE FETCH */
+async function updatePlayerCounts() {
+    const ids = games.map(g => g.placeId).join(',');
+
     try {
-        const res = await fetch(`https://games.roblox.com/v1/games/multiget-place-details?placeIds=${placeId}`);
+        const res = await fetch(`https://games.roblox.com/v1/games/multiget-place-details?placeIds=${ids}`);
         const data = await res.json();
-        return data?.data?.[0]?.playing || 0;
+
+        data.data.forEach(game => {
+            const el = document.getElementById(`players-${game.placeId}`);
+            if (!el) return;
+
+            el.innerHTML = `<span class="pulse"></span>${game.playing.toLocaleString()} online`;
+            el.className = 'player-count';
+        });
+
     } catch (e) {
         console.error(e);
-        return null;
+
+        document.querySelectorAll('.player-count').forEach(el => {
+            el.textContent = 'Unable to load';
+            el.className = 'player-count error';
+        });
     }
 }
 
-async function updatePlayerCounts() {
-    for (const game of games) {
-        const countEl = document.getElementById(`players-${game.placeId}`);
-        const currentCount = countEl.dataset.current || 0;
-
-        const count = await fetchPlayerCount(game.placeId);
-        if (count !== null) {
-            if (count != currentCount) {
-                countEl.dataset.current = count;
-                countEl.innerHTML = `<span class="pulse"></span>${count.toLocaleString()} online`;
-                countEl.className = 'player-count';
-            }
-        } else {
-            countEl.textContent = 'Unable to load';
-            countEl.className = 'player-count error';
-        }
-    }
-}
-
-// Initialize
+/* INIT */
 games.forEach(createGameCard);
 updatePlayerCounts();
 setInterval(updatePlayerCounts, 30000);
 </script>
+
 </body>
 </html>
