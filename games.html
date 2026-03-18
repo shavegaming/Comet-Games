@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comet SS | Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #0a0e1a;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        header {
+            margin-bottom: 50px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #1e293b;
+        }
+
+        h1 {
+            color: #3b82f6;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .game-card {
+            background: #151b29;
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid #1e293b;
+            transition: all 0.3s ease;
+        }
+
+        .game-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+        }
+
+        .game-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .game-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            background: #1e293b;
+            object-fit: cover;
+        }
+
+        .game-title {
+            color: #ffffff;
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .game-genre {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+
+        .player-info {
+            background: #0a0e1a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .player-label {
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .player-count {
+            color: #4ade80;
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .player-count.loading {
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        .player-count.error {
+            color: #f87171;
+            font-size: 0.9rem;
+        }
+
+        .pulse {
+            width: 8px;
+            height: 8px;
+            background: #4ade80;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .join-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            background: #3b82f6;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .join-btn:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+
+        footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #1e293b;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .refresh-info {
+            text-align: center;
+            color: #64748b;
+            font-size: 0.85rem;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Comet SS | Games</h1>
+            <p class="subtitle">Real-time player counts • Updated automatically</p>
+        </header>
+
+        <div class="games-grid" id="gamesGrid">
+            <!-- Games loaded dynamically -->
+        </div>
+
+        <div class="refresh-info">
+            Player counts update every 30 seconds
+        </div>
+
+        <footer>
+            <p>&copy; 2025 Comet SS. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        const games = [
+            { placeId: '114298054503384', name: '🎲 Kick RNG 🔥 (CRAZY DROPS!)', genre: 'RNG' },
+            { placeId: '133091376554829', name: '[🌊] Escape Waves For Lucky Blocks', genre: 'Brainrot' },
+            { placeId: '133489210470821', name: 'Comet Hangout', genre: 'Hangout' },
+            { placeId: '121942690506017', name: 'Forsaken Doors Edition REBORN', genre: 'Horror' },
+            { placeId: '10673689549', name: 'Multi obby', genre: 'Obby' },
+            { placeId: '137010059674036', name: '[💘] Slap Tower 🖐️ [X999]', genre: 'Obby' },
+        ];
+
+        async function fetchPlayerCount(placeId) {
+            try {
+                // Get universe ID first
+                const universeRes = await fetch(`https://api.roblox.com/games/getgamev2?placeId=${placeId}`);
+                const universeData = await universeRes.json();
+                
+                if (!universeData.UniverseId) return null;
+
+                // Get player count
+                const playersRes = await fetch(`https://games.roblox.com/v1/games?universeIds=${universeData.UniverseId}`);
+                const playersData = await playersRes.json();
+                
+                return playersData.data?.[0]?.playing || 0;
+            } catch (error) {
+                console.error('Error fetching player count:', error);
+                return null;
+            }
+        }
+
+        async function loadGames() {
+            const grid = document.getElementById('gamesGrid');
+            
+            for (const game of games) {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                
+                card.innerHTML = `
+                    <div class="game-header">
+                        <img src="https://tr.rbxcdn.com/${game.placeId}/150/150/Image/Webp/noFilter" 
+                             alt="${game.name}" 
+                             class="game-icon"
+                             onerror="this.src='https://via.placeholder.com/80?text=No+Icon'">
+                        <div>
+                            <div class="game-title">${game.name}</div>
+                            <div class="game-genre">${game.genre}</div>
+                        </div>
+                    </div>
+                    <div class="player-info">
+                        <div class="player-label">Active Players</div>
+                        <div class="player-count loading" id="players-${game.placeId}">
+                            Loading...
+                        </div>
+                    </div>
+                    <a href="https://www.roblox.com/games/${game.placeId}" 
+                       target="_blank" 
+                       class="join-btn">
+                        Join Game
+                    </a>
+                `;
+                
+                grid.appendChild(card);
+                
+                // Fetch real player count
+                const count = await fetchPlayerCount(game.placeId);
+                const playerEl = document.getElementById(`players-${game.placeId}`);
+                
+                if (count !== null) {
+                    playerEl.innerHTML = `<span class="pulse"></span>${count.toLocaleString()} online`;
+                    playerEl.classList.remove('loading');
+                } else {
+                    playerEl.textContent = 'Unable to load';
+                    playerEl.classList.remove('loading');
+                    playerEl.classList.add('error');
+                }
+            }
+        }
+
+        loadGames();
+        setInterval(loadGames, 30000);
+    </script>
+</body>
+</html>
