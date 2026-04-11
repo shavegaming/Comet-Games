@@ -2,277 +2,161 @@
 
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Comet SS | Games</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Comet SS — Games</title>
 
-  <style>
-    :root {
-      --bg:#0b0f19;
-      --card:#131824;
-      --border:#1e293b;
-      --accent:#3b82f6;
-      --text:#e2e8f0;
-      --muted:#64748b;
-      --green:#22c55e;
-      --red:#ef4444;
-    }
+<script src="https://cdn.tailwindcss.com"></script>
 
-    * { margin:0; padding:0; box-sizing:border-box; }
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap');
 
-    body {
-      font-family:system-ui,-apple-system,sans-serif;
-      background:var(--bg);
-      color:var(--text);
-      min-height:100vh;
-      overflow-x:hidden;
-    }
+body {
+  font-family: 'Inter', sans-serif;
+  background:#000;
+}
 
-    /* ✨ animated shooting lines */
-    body::before {
-      content:"";
-      position:fixed;
-      width:200%;
-      height:200%;
-      background:linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%);
-      animation:move 8s linear infinite;
-      pointer-events:none;
-    }
-
-    @keyframes move {
-      0% { transform:translate(-50%, -50%) rotate(0deg); }
-      100% { transform:translate(0%, 0%) rotate(360deg); }
-    }
-
-    .container {
-      max-width:1100px;
-      margin:0 auto;
-      padding:40px 20px;
-      position:relative;
-      z-index:2;
-    }
-
-    header { text-align:center; margin-bottom:40px; }
-
-    h1 {
-      font-size:2.5rem;
-      font-weight:800;
-      background:linear-gradient(135deg,#60a5fa,#a78bfa);
-      -webkit-background-clip:text;
-      color:transparent;
-    }
-
-    .subtitle { color:var(--muted); margin-top:8px; }
-
-    .grid {
-      display:grid;
-      grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
-      gap:20px;
-    }
-
-    .card {
-      background:var(--card);
-      border:1px solid var(--border);
-      border-radius:14px;
-      padding:20px;
-      transition:0.25s;
-      backdrop-filter:blur(10px);
-    }
-
-    .card:hover {
-      background:#1a2030;
-      transform:translateY(-4px) scale(1.01);
-      border-color:var(--accent);
-      box-shadow:0 10px 30px rgba(0,0,0,0.4);
-    }
-
-    .top { display:flex; gap:14px; margin-bottom:16px; }
-
-    .thumb {
-      width:80px;
-      height:80px;
-      border-radius:10px;
-      object-fit:cover;
-      border:1px solid var(--border);
-      background:#1e293b;
-    }
-
-    .info { flex:1; min-width:0; }
-
-    .title {
-      font-weight:600;
-      margin-bottom:4px;
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
-    }
-
-    .genre {
-      font-size:0.8rem;
-      color:var(--muted);
-      text-transform:uppercase;
-    }
-
-    .stats {
-      background:rgba(0,0,0,0.25);
-      padding:12px;
-      border-radius:8px;
-      margin-bottom:14px;
-      display:flex;
-      justify-content:space-between;
-    }
-
-    .label { color:var(--muted); font-size:0.85rem; }
-
-    .count {
-      font-family:monospace;
-      font-weight:700;
-      display:flex;
-      align-items:center;
-      gap:6px;
-    }
-
-    .count.online { color:var(--green); }
-    .count.offline { color:var(--muted); }
-    .count.error { color:var(--red); }
-
-    .dot {
-      width:6px;
-      height:6px;
-      border-radius:50%;
-      background:currentColor;
-    }
-
-    .btn {
-      display:block;
-      text-align:center;
-      background:var(--accent);
-      color:white;
-      padding:10px;
-      border-radius:6px;
-      text-decoration:none;
-      font-weight:600;
-      transition:0.2s;
-    }
-
-    .btn:hover { background:#2563eb; }
-
-    .refresh {
-      position:fixed;
-      bottom:20px;
-      right:20px;
-      background:var(--accent);
-      color:white;
-      border:none;
-      padding:12px 20px;
-      border-radius:8px;
-      cursor:pointer;
-      font-weight:600;
-    }
-  </style>
+.pattern-grid {
+  background-image: radial-gradient(rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+</style>
 
 </head>
 
-<body>
-  <div class="container">
-    <header>
-      <h1>Comet SS | Games</h1>
-      <p class="subtitle">Live player tracking • Updates every 30s</p>
-    </header>
+<body class="bg-black text-white pattern-grid">
 
-```
-<div class="grid" id="grid"></div>
+<!-- NAV -->
 
-<button class="refresh" id="refreshBtn" onclick="fetchPlayers()">🔄 Refresh</button>
-```
-
+<nav class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/10">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center font-black">C</div>
+      <span class="font-black text-xl">Comet SS</span>
+    </div>
   </div>
+</nav>
 
-  <script>
-    const games = [
-      { id:'107800434678184', name:'AURA FARM', genre:'Simulator' },
-      { id:'110509672909570', name:'Swing Brainrot', genre:'Obby' },
-      { id:'82769819426276', name:'WARBLOX', genre:'Action' },
-      { id:'139153100612917', name:'Run From Sammy', genre:'Horror' },
-      { id:'127397808901834', name:'mm2 falso', genre:'Mystery' }
-    ];
+<!-- MAIN -->
 
-    const grid = document.getElementById('grid');
-    const btn = document.getElementById('refreshBtn');
+<section class="pt-32 pb-20 px-6">
+<div class="max-w-7xl mx-auto">
 
-    games.forEach(g => {
-      const card = document.createElement('div');
-      card.className = 'card';
+<!-- TITLE -->
 
-      card.innerHTML = `
-        <div class="top">
-          <img class="thumb" id="img-${g.id}">
-          <div class="info">
-            <div class="title">${g.name}</div>
-            <div class="genre">${g.genre}</div>
-          </div>
-        </div>
+<div class="text-center mb-16">
+  <h1 class="text-6xl md:text-7xl font-black tracking-tight">Comet <span class="text-white/70">Games</span></h1>
+  <p class="text-white/50 mt-4">Live infected games • Auto updating</p>
+</div>
 
-        <div class="stats">
-          <span class="label">Players</span>
-          <span class="count" id="c-${g.id}">Loading...</span>
-        </div>
+<!-- GRID -->
 
-        <a href="https://www.roblox.com/games/${g.id}" target="_blank" class="btn">Join</a>
-      `;
+<div id="grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
 
-      grid.appendChild(card);
+</div>
+</section>
+
+<!-- REFRESH -->
+
+<button onclick="fetchPlayers()" id="refreshBtn"
+class="fixed bottom-6 right-6 px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-semibold backdrop-blur">
+Refresh </button>
+
+<script>
+const games = [
+  { id:'107800434678184', name:'AURA FARM', genre:'Simulator' },
+  { id:'110509672909570', name:'Swing Brainrot', genre:'Obby' },
+  { id:'82769819426276', name:'WARBLOX', genre:'Action' },
+  { id:'139153100612917', name:'Run From Sammy', genre:'Horror' },
+  { id:'127397808901834', name:'mm2 falso', genre:'Mystery' }
+];
+
+const grid = document.getElementById('grid');
+
+games.forEach(g => {
+  const el = document.createElement('div');
+
+  el.className = "bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl hover:bg-white/10 transition";
+
+  el.innerHTML = `
+    <div class="flex gap-4">
+      <img id="img-${g.id}" class="w-20 h-20 rounded-xl bg-white/10 object-cover">
+
+      <div class="flex-1">
+        <div class="font-bold text-lg">${g.name}</div>
+        <div class="text-white/40 text-sm">${g.genre}</div>
+
+        <div id="c-${g.id}" class="mt-3 text-white/60 text-sm">Loading...</div>
+      </div>
+    </div>
+
+    <a href="https://www.roblox.com/games/${g.id}" target="_blank"
+    class="mt-5 block text-center py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20">
+    Join Game
+    </a>
+  `;
+
+  grid.appendChild(el);
+});
+
+
+/* ✅ THUMBNAILS FIX (roproxy) */
+async function loadThumbnails() {
+  const ids = games.map(g => g.id).join(',');
+  const url = `https://thumbnails.roproxy.com/v1/games/icons?placeIds=${ids}&size=150x150&format=Png`;
+
+  try {
+    const res = await fetch(url);
+    const json = await res.json();
+
+    json.data.forEach(t => {
+      const img = document.getElementById(`img-${t.placeId}`);
+      if (img) img.src = t.imageUrl;
     });
 
-    async function loadThumbnails() {
-      const ids = games.map(g => g.id).join(',');
-      const url = `https://thumbnails.roblox.com/v1/games/icons?placeIds=${ids}&size=150x150&format=Png`;
+  } catch {
+    console.log("thumbnail fail");
+  }
+}
 
-      const res = await fetch(url);
-      const json = await res.json();
 
-      json.data.forEach(t => {
-        const img = document.getElementById(`img-${t.placeId}`);
-        if (img) img.src = t.imageUrl;
-      });
-    }
+/* ✅ PLAYER COUNT FIX */
+async function fetchPlayers() {
+  const btn = document.getElementById("refreshBtn");
+  btn.disabled = true;
 
-    async function fetchPlayers() {
-      btn.disabled = true;
+  const ids = games.map(g => g.id).join(',');
+  const url = `https://games.roproxy.com/v1/games/multiget-place-details?placeIds=${ids}`;
 
-      const ids = games.map(g => g.id).join(',');
-      const url = `https://games.roproxy.com/v1/games/multiget-place-details?placeIds=${ids}`;
+  try {
+    const res = await fetch(url);
+    const json = await res.json();
 
-      try {
-        const res = await fetch(url);
-        const json = await res.json();
+    const map = {};
+    json.data.forEach(g => map[g.placeId] = g.playing);
 
-        const map = {};
-        json.data.forEach(g => map[g.placeId] = g.playing);
+    games.forEach(g => {
+      const el = document.getElementById(`c-${g.id}`);
+      const count = map[g.id] ?? 0;
 
-        games.forEach(g => {
-          const el = document.getElementById(`c-${g.id}`);
-          const count = map[g.id] ?? 0;
+      el.innerHTML = `<span class="text-white/40">Players:</span> <span class="font-bold">${count}</span>`;
+    });
 
-          el.className = "count " + (count > 0 ? "online" : "offline");
-          el.innerHTML = `<span class="dot"></span> ${count}`;
-        });
+  } catch {
+    games.forEach(g => {
+      document.getElementById(`c-${g.id}`).innerText = "Error";
+    });
+  }
 
-      } catch {
-        games.forEach(g => {
-          const el = document.getElementById(`c-${g.id}`);
-          el.className = 'count error';
-          el.innerHTML = `<span class="dot"></span> Error`;
-        });
-      }
+  btn.disabled = false;
+}
 
-      btn.disabled = false;
-    }
 
-    loadThumbnails();
-    fetchPlayers();
-    setInterval(fetchPlayers, 30000);
-  </script>
+/* INIT */
+loadThumbnails();
+fetchPlayers();
+setInterval(fetchPlayers, 30000);
+</script>
 
 </body>
 </html>
