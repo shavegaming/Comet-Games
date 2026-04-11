@@ -26,88 +26,69 @@ body {
 
 <body class="bg-black text-white pattern-grid">
 
-<!-- NAV -->
-
-<nav class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/10">
-  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between">
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center font-black">C</div>
-      <span class="font-black text-xl">Comet SS</span>
-    </div>
-  </div>
+<nav class="fixed top-0 left-0 right-0 bg-black/80 backdrop-blur border-b border-white/10 z-50">
+  <div class="max-w-7xl mx-auto px-6 py-4 font-bold">Comet SS</div>
 </nav>
 
-<!-- MAIN -->
-
-<section class="pt-32 pb-20 px-6">
+<section class="pt-32 px-6 pb-20">
 <div class="max-w-7xl mx-auto">
 
-<!-- TITLE -->
+<h1 class="text-6xl font-black mb-12">Comet Games</h1>
 
-<div class="text-center mb-16">
-  <h1 class="text-6xl md:text-7xl font-black tracking-tight">Comet <span class="text-white/70">Games</span></h1>
-  <p class="text-white/50 mt-4">Live infected games • Auto updating</p>
-</div>
-
-<!-- GRID -->
-
-<div id="grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+<div id="grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
 </div>
 </section>
 
-<!-- REFRESH -->
-
-<button onclick="fetchPlayers()" id="refreshBtn"
-class="fixed bottom-6 right-6 px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 rounded-xl font-semibold backdrop-blur">
-Refresh </button>
-
 <script>
 const games = [
-  { id:'107800434678184', name:'AURA FARM', genre:'Simulator' },
-  { id:'110509672909570', name:'Swing Brainrot', genre:'Obby' },
-  { id:'82769819426276', name:'WARBLOX', genre:'Action' },
-  { id:'139153100612917', name:'Run From Sammy', genre:'Horror' },
-  { id:'127397808901834', name:'mm2 falso', genre:'Mystery' }
+  { id:'107800434678184', name:'AURA FARM' },
+  { id:'110509672909570', name:'Swing Brainrot' },
+  { id:'82769819426276', name:'WARBLOX' },
+  { id:'139153100612917', name:'Run From Sammy' },
+  { id:'127397808901834', name:'mm2 falso' }
 ];
 
 const grid = document.getElementById('grid');
 
 games.forEach(g => {
-  const el = document.createElement('div');
+  const div = document.createElement('div');
+  div.className = "bg-white/5 border border-white/10 rounded-xl p-5";
 
-  el.className = "bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-xl hover:bg-white/10 transition";
-
-  el.innerHTML = `
-    <div class="flex gap-4">
-      <img id="img-${g.id}" class="w-20 h-20 rounded-xl bg-white/10 object-cover">
-
-      <div class="flex-1">
-        <div class="font-bold text-lg">${g.name}</div>
-        <div class="text-white/40 text-sm">${g.genre}</div>
-
-        <div id="c-${g.id}" class="mt-3 text-white/60 text-sm">Loading...</div>
-      </div>
-    </div>
-
-    <a href="https://www.roblox.com/games/${g.id}" target="_blank"
-    class="mt-5 block text-center py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20">
-    Join Game
-    </a>
+  div.innerHTML = `
+    <img id="img-${g.id}" class="w-full h-40 object-cover rounded-lg mb-3 bg-white/10">
+    <div class="font-bold">${g.name}</div>
+    <div id="c-${g.id}" class="text-white/50 text-sm mt-1">Loading...</div>
   `;
 
-  grid.appendChild(el);
+  grid.appendChild(div);
 });
 
 
-/* ✅ THUMBNAILS FIX (roproxy) */
+// 🔥 MULTI PROXY FETCH
+async function fetchWithFallback(urls) {
+  for (let url of urls) {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) continue;
+      return await res.json();
+    } catch {}
+  }
+  throw new Error("All failed");
+}
+
+
+// ✅ THUMBNAILS (FIXED)
 async function loadThumbnails() {
   const ids = games.map(g => g.id).join(',');
-  const url = `https://thumbnails.roproxy.com/v1/games/icons?placeIds=${ids}&size=150x150&format=Png`;
+
+  const urls = [
+    `https://thumbnails.roproxy.com/v1/games/icons?placeIds=${ids}&size=150x150&format=Png&isCircular=false`,
+    `https://corsproxy.io/?https://thumbnails.roblox.com/v1/games/icons?placeIds=${ids}&size=150x150&format=Png&isCircular=false`
+  ];
 
   try {
-    const res = await fetch(url);
-    const json = await res.json();
+    const json = await fetchWithFallback(urls);
 
     json.data.forEach(t => {
       const img = document.getElementById(`img-${t.placeId}`);
@@ -115,44 +96,40 @@ async function loadThumbnails() {
     });
 
   } catch {
-    console.log("thumbnail fail");
+    console.log("thumbs dead");
   }
 }
 
 
-/* ✅ PLAYER COUNT FIX */
+// ✅ PLAYERS (MULTI FIX)
 async function fetchPlayers() {
-  const btn = document.getElementById("refreshBtn");
-  btn.disabled = true;
-
   const ids = games.map(g => g.id).join(',');
-  const url = `https://games.roproxy.com/v1/games/multiget-place-details?placeIds=${ids}`;
+
+  const urls = [
+    `https://games.roproxy.com/v1/games/multiget-place-details?placeIds=${ids}`,
+    `https://corsproxy.io/?https://games.roblox.com/v1/games/multiget-place-details?placeIds=${ids}`
+  ];
 
   try {
-    const res = await fetch(url);
-    const json = await res.json();
+    const json = await fetchWithFallback(urls);
 
     const map = {};
     json.data.forEach(g => map[g.placeId] = g.playing);
 
     games.forEach(g => {
       const el = document.getElementById(`c-${g.id}`);
-      const count = map[g.id] ?? 0;
-
-      el.innerHTML = `<span class="text-white/40">Players:</span> <span class="font-bold">${count}</span>`;
+      el.innerText = `Players: ${map[g.id] ?? 0}`;
     });
 
   } catch {
     games.forEach(g => {
-      document.getElementById(`c-${g.id}`).innerText = "Error";
+      document.getElementById(`c-${g.id}`).innerText = "API Blocked";
     });
   }
-
-  btn.disabled = false;
 }
 
 
-/* INIT */
+// INIT
 loadThumbnails();
 fetchPlayers();
 setInterval(fetchPlayers, 30000);
