@@ -5,53 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Comet SS | Games</title>
   <style>
-    :root {
-      --bg: #0b0f19;
-      --card: #131824;
-      --card-hover: #1a2030;
-      --border: #1e293b;
-      --accent: #3b82f6;
-      --text: #e2e8f0;
-      --muted: #64748b;
-      --success: #22c55e;
-      --error: #ef4444;
-    }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
-    .container { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
-    header { text-align: center; margin-bottom: 40px; }
-    h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #a78bfa); -webkit-background-clip: text; color: transparent; }
-    .subtitle { color: var(--muted); margin-top: 8px; font-size: 0.95rem; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; transition: 0.2s ease; }
-    .card:hover { background: var(--card-hover); transform: translateY(-2px); border-color: var(--accent); }
-    .top { display: flex; gap: 14px; margin-bottom: 16px; }
-    .thumb { width: 80px; height: 80px; border-radius: 8px; background: #1e293b; object-fit: cover; }
-    .info { flex: 1; }
-    .title { font-weight: 600; margin-bottom: 4px; }
-    .genre { font-size: 0.8rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
-    .stats { background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; margin-bottom: 14px; display: flex; justify-content: space-between; align-items: center; }
-    .label { font-size: 0.85rem; color: var(--muted); }
-    .count { font-family: monospace; font-weight: 700; display: flex; align-items: center; gap: 6px; }
-    .count.online { color: var(--success); }
-    .count.offline { color: var(--muted); }
-    .count.error { color: var(--error); }
-    .count.loading { color: var(--muted); }
-    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
-    .btn { display: block; text-align: center; background: var(--accent); color: white; padding: 10px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: 0.2s; }
-    .btn:hover { background: #2563eb; }
-    .refresh { position: fixed; bottom: 20px; right: 20px; background: var(--accent); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
-    .refresh:hover { background: #2563eb; }
+    :root { --bg:#0b0f19; --card:#131824; --border:#1e293b; --accent:#3b82f6; --text:#e2e8f0; --muted:#64748b; --green:#22c55e; --red:#ef4444; }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
+    .container { max-width:1100px; margin:0 auto; padding:40px 20px; }
+    header { text-align:center; margin-bottom:40px; }
+    h1 { font-size:2.5rem; font-weight:800; background:linear-gradient(135deg,#60a5fa,#a78bfa); -webkit-background-clip:text; color:transparent; }
+    .subtitle { color:var(--muted); margin-top:8px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:20px; }
+    .card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:20px; transition:0.2s ease; }
+    .card:hover { background:#1a2030; transform:translateY(-2px); border-color:var(--accent); }
+    .top { display:flex; gap:14px; margin-bottom:16px; }
+    .thumb { width:80px; height:80px; border-radius:8px; background:#1e293b; object-fit:cover; border:1px solid var(--border); }
+    .info { flex:1; min-width:0; }
+    .title { font-weight:600; margin-bottom:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .genre { font-size:0.8rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; }
+    .stats { background:rgba(0,0,0,0.25); padding:12px; border-radius:8px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; }
+    .label { font-size:0.85rem; color:var(--muted); }
+    .count { font-family:monospace; font-weight:700; display:flex; align-items:center; gap:6px; font-size:1rem; }
+    .count.online { color:var(--green); }
+    .count.offline { color:var(--muted); }
+    .count.error { color:var(--red); }
+    .count.loading { color:var(--muted); }
+    .dot { width:6px; height:6px; border-radius:50%; background:currentColor; display:inline-block; }
+    .btn { display:block; text-align:center; background:var(--accent); color:white; padding:10px; border-radius:6px; text-decoration:none; font-weight:600; transition:0.2s; }
+    .btn:hover { background:#2563eb; }
+    .refresh { position:fixed; bottom:20px; right:20px; background:var(--accent); color:white; border:none; padding:12px 20px; border-radius:8px; cursor:pointer; font-weight:600; box-shadow:0 4px 12px rgba(0,0,0,0.3); transition:0.2s; }
+    .refresh:hover { background:#2563eb; transform:translateY(-1px); }
+    .refresh:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <h1>Comet SS | Games</h1>
-      <p class="subtitle">Live player tracking • Auto-updates every 30s</p>
+      <p class="subtitle">Live player tracking • Updates every 30s</p>
     </header>
     <div class="grid" id="grid"></div>
-    <button class="refresh" onclick="refresh()">🔄 Refresh Now</button>
+    <button class="refresh" id="refreshBtn" onclick="fetchPlayers()">🔄 Refresh Now</button>
   </div>
 
   <script>
@@ -78,6 +69,7 @@
     ];
 
     const grid = document.getElementById('grid');
+    const btn = document.getElementById('refreshBtn');
 
     // Render cards
     games.forEach(g => {
@@ -85,7 +77,7 @@
       card.className = 'card';
       card.innerHTML = `
         <div class="top">
-          <img class="thumb" src="https://www.roblox.com/asset-thumbnail/image?assetId=${g.id}&width=150&height=150&format=png" onerror="this.src='https://tr.rbxcdn.com/38c6edcb50639d471ec4056485764fa8/420/420/Image/Png'">
+          <img class="thumb" src="https://tr.rbxcdn.com/38c6edcb50639d471ec4056485764fa8/420/420/Image/Png" data-id="${g.id}">
           <div class="info">
             <div class="title">${g.name}</div>
             <div class="genre">${g.genre}</div>
@@ -100,49 +92,96 @@
       grid.appendChild(card);
     });
 
-    async function refresh() {
+    // Fix thumbnails using Roblox's official thumbnails API
+    async function loadThumbnails() {
       const ids = games.map(g => g.id).join(',');
-      const proxy = 'https://corsproxy.io/?';
-      const url = `https://games.roblox.com/v1/games/multiget-place-details?placeIds=${ids}`;
+      const proxy = 'https://api.allorigins.win/raw?url=';
+      const url = `https://thumbnails.roblox.com/v1/games/icons?placeIds=${ids}&size=150x150&format=Png&isCircular=false`;
+      
+      try {
+        const res = await fetch(proxy + encodeURIComponent(url));
+        const json = await res.json();
+        if (json.data) {
+          json.data.forEach(t => {
+            const img = document.querySelector(`img[data-id="${t.placeId}"]`);
+            if (img) img.src = t.imageUrl;
+          });
+        }
+      } catch (e) { console.log('🖼️ Thumbnails failed, using fallback'); }
+    }
 
-      document.querySelectorAll('.count').forEach(el => {
+    // Fetch player counts
+    async function fetchPlayers() {
+      btn.disabled = true;
+      btn.textContent = '⏳ Updating...';
+      
+      // Reset all to loading
+      games.forEach(g => {
+        const el = document.getElementById(`c-${g.id}`);
         el.className = 'count loading';
         el.innerHTML = '<span class="dot"></span> Loading...';
       });
 
-      try {
-        const res = await fetch(proxy + encodeURIComponent(url));
-        if (!res.ok) throw new Error('Proxy/Network failed');
-        const json = await res.json();
+      const ids = games.map(g => g.id).join(',');
+      const target = `https://games.roblox.com/v1/games/multiget-place-details?placeIds=${ids}`;
+      
+      // Try multiple proxies in order
+      const proxies = [
+        url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+        url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+        url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+      ];
 
-        if (!json.data) throw new Error('Invalid API format');
+      let success = false;
+      for (const proxyFn of proxies) {
+        try {
+          const proxyUrl = proxyFn(target);
+          const res = await fetch(proxyUrl, { cache: 'no-store', headers: { 'Accept': 'application/json' } });
+          if (!res.ok) continue;
+          
+          const json = await res.json();
+          if (!json.data) continue;
 
-        const map = {};
-        json.data.forEach(item => map[item.placeId] = item.playing);
+          const map = {};
+          json.data.forEach(item => map[item.placeId] = item.playing ?? 0);
 
+          games.forEach(g => {
+            const el = document.getElementById(`c-${g.id}`);
+            const count = map[g.id] ?? null;
+            if (count !== null) {
+              el.className = `count ${count > 0 ? 'online' : 'offline'}`;
+              el.innerHTML = `<span class="dot"></span> ${count.toLocaleString()}`;
+            } else {
+              el.className = 'count error';
+              el.innerHTML = '<span class="dot"></span> Not Found';
+            }
+          });
+          success = true;
+          console.log('✅ Player counts updated successfully');
+          break;
+        } catch (e) {
+          console.log(`⚠️ Proxy failed: ${proxyFn.toString().match(/https:\/\/[^/]+/)[0]}`, e.message);
+          continue;
+        }
+      }
+
+      if (!success) {
         games.forEach(g => {
           const el = document.getElementById(`c-${g.id}`);
-          const count = map[g.id];
-          if (count !== undefined) {
-            el.className = `count ${count > 0 ? 'online' : 'offline'}`;
-            el.innerHTML = `<span class="dot"></span> ${count.toLocaleString()}`;
-          } else {
-            el.className = 'count error';
-            el.innerHTML = '<span class="dot"></span> Not Found';
-          }
-        });
-        console.log('✅ Player counts updated');
-      } catch (err) {
-        console.error('❌ Fetch error:', err);
-        document.querySelectorAll('.count').forEach(el => {
           el.className = 'count error';
-          el.innerHTML = '<span class="dot"></span> Error (See Console)';
+          el.innerHTML = '<span class="dot"></span> Blocked/Offline';
         });
+        console.error('❌ All proxies failed. Disable AdBlock/Privacy extensions or host on a server.');
       }
+
+      btn.disabled = false;
+      btn.textContent = '🔄 Refresh Now';
     }
 
-    refresh();
-    setInterval(refresh, 30000);
+    // Init
+    loadThumbnails();
+    fetchPlayers();
+    setInterval(fetchPlayers, 30000);
   </script>
 </body>
 </html>
