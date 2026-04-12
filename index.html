@@ -82,10 +82,13 @@ async function fetchWithFallback(urls) {
 async function loadThumbnails() {
   const ids = games.map(g => g.id).join(',');
 
-  const urls = [
-    `https://thumbnails.roproxy.com/v1/games/icons?placeIds=${ids}&size=150x150&format=Png&isCircular=false`,
-    `https://corsproxy.io/?https://thumbnails.roblox.com/v1/games/icons?placeIds=${ids}&size=150x150&format=Png&isCircular=false`
-  ];
+const proxy = "https://workers-playground-lingering-flower-7582.nevergonnagiveyouroverflow.workers.dev";
+
+const urls = [
+  `${proxy}/?url=${encodeURIComponent(
+    `https://thumbnails.roblox.com/v1/games/icons?placeIds=${ids}&size=150x150&format=Png&isCircular=false`
+  )}`
+];
 
   try {
     const json = await fetchWithFallback(urls);
