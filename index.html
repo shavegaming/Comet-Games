@@ -26,14 +26,20 @@ body {
 
 <body class="bg-black text-white pattern-grid">
 
-<nav class="fixed top-0 left-0 right-0 bg-black/80 backdrop-blur border-b border-white/10 z-50">
-  <div class="max-w-7xl mx-auto px-6 py-4 font-bold">Comet SS</div>
+<!-- NAV -->
+
+<nav class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur border-b border-white/10">
+  <div class="max-w-7xl mx-auto px-6 py-4 font-bold text-lg">
+    Comet SS — Games
+  </div>
 </nav>
+
+<!-- MAIN -->
 
 <section class="pt-32 px-6 pb-20">
 <div class="max-w-7xl mx-auto">
 
-<h1 class="text-6xl font-black mb-12">Comet Games</h1>
+<h1 class="text-5xl md:text-6xl font-black mb-12">Live Games</h1>
 
 <div id="grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
@@ -41,6 +47,8 @@ body {
 </section>
 
 <script>
+const proxy = "https://workers-playground-lingering-flower-7582.nevergonnagiveyouroverflow.workers.dev";
+
 const games = [
   { id:'107800434678184', name:'AURA FARM' },
   { id:'110509672909570', name:'Swing Brainrot' },
@@ -49,72 +57,58 @@ const games = [
   { id:'127397808901834', name:'mm2 falso' }
 ];
 
+// build UI
 const grid = document.getElementById('grid');
 
 games.forEach(g => {
-  const div = document.createElement('div');
-  div.className = "bg-white/5 border border-white/10 rounded-xl p-5";
+  const card = document.createElement('div');
 
-  div.innerHTML = `
+  card.className = "bg-white/5 border border-white/10 rounded-xl p-5 backdrop-blur";
+
+  card.innerHTML = `
     <img id="img-${g.id}" class="w-full h-40 object-cover rounded-lg mb-3 bg-white/10">
-    <div class="font-bold">${g.name}</div>
-    <div id="c-${g.id}" class="text-white/50 text-sm mt-1">Loading...</div>
+    <div class="font-bold text-lg">${g.name}</div>
+    <div id="c-${g.id}" class="text-white/50 text-sm mt-2">Loading players...</div>
   `;
 
-  grid.appendChild(div);
+  grid.appendChild(card);
 });
 
 
-// 🔥 MULTI PROXY FETCH
-async function fetchWithFallback(urls) {
-  for (let url of urls) {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) continue;
-      return await res.json();
-    } catch {}
-  }
-  throw new Error("All failed");
-}
-
-
-// ✅ THUMBNAILS (FIXED)
+// 🔥 LOAD THUMBNAILS (WORKER ONLY)
 async function loadThumbnails() {
   const ids = games.map(g => g.id).join(',');
 
-const proxy = "https://workers-playground-lingering-flower-7582.nevergonnagiveyouroverflow.workers.dev";
-
-const urls = [
-  `${proxy}/?url=${encodeURIComponent(
+  const url = `${proxy}/?url=${encodeURIComponent(
     `https://thumbnails.roblox.com/v1/games/icons?placeIds=${ids}&size=150x150&format=Png&isCircular=false`
-  )}`
-];
+  )}`;
 
   try {
-    const json = await fetchWithFallback(urls);
+    const res = await fetch(url);
+    const json = await res.json();
 
     json.data.forEach(t => {
       const img = document.getElementById(`img-${t.placeId}`);
       if (img) img.src = t.imageUrl;
     });
 
-  } catch {
-    console.log("thumbs dead");
+  } catch (err) {
+    console.log("Thumbnail error:", err);
   }
 }
 
 
-// ✅ PLAYERS (MULTI FIX)
+// 🔥 LOAD PLAYER COUNTS (WORKER ONLY)
 async function fetchPlayers() {
   const ids = games.map(g => g.id).join(',');
 
-  const urls = [
-    `https://games.roproxy.com/v1/games/multiget-place-details?placeIds=${ids}`,
-    `https://corsproxy.io/?https://games.roblox.com/v1/games/multiget-place-details?placeIds=${ids}`
-  ];
+  const url = `${proxy}/?url=${encodeURIComponent(
+    `https://games.roblox.com/v1/games/multiget-place-details?placeIds=${ids}`
+  )}`;
 
   try {
-    const json = await fetchWithFallback(urls);
+    const res = await fetch(url);
+    const json = await res.json();
 
     const map = {};
     json.data.forEach(g => map[g.placeId] = g.playing);
@@ -124,9 +118,11 @@ async function fetchPlayers() {
       el.innerText = `Players: ${map[g.id] ?? 0}`;
     });
 
-  } catch {
+  } catch (err) {
+    console.log("Player API error:", err);
+
     games.forEach(g => {
-      document.getElementById(`c-${g.id}`).innerText = "API Blocked";
+      document.getElementById(`c-${g.id}`).innerText = "API Error";
     });
   }
 }
